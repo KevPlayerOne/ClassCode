@@ -1,0 +1,44 @@
+'''
+Simple Rainbow Table Construction 
+using, a dictionary
+'''
+import itertools
+import hashlib
+import pickle
+from prettytable import PrettyTable
+
+rainbowTable = {}
+
+print("Create Simple Rainbow Table")
+for variations in range(4, 8):
+    for pwTuple in itertools.product("abc123&", repeat=variations):
+        pw = ""
+        md5Hash = hashlib.md5()
+        for eachChr in pwTuple:
+            pw = pw+"".join(eachChr)
+        pw = bytes(pw, 'ascii')
+        md5Hash.update(pw)
+        md5Digest = md5Hash.hexdigest()
+        pw.decode('ascii')
+        rainbowTable[md5Digest] = pw
+        
+pickleFileWrite = open('rainbow.db', 'wb')
+pickle.dump(rainbowTable, pickleFileWrite) 
+
+
+firstFive = list(rainbowTable.items())[:5]
+lastFive = list(rainbowTable.items())[-5:]
+
+tbl = PrettyTable(['MD5 Hash', 'Password'])
+for md5Digest, pw in rainbowTable.items():
+    tbl.add_row([pw.decode('ASCII'), md5Digest])
+
+tbl.align = "l" 
+resultString = tbl.get_string(reversesort=True)
+
+
+print("First-Five:",firstFive)
+print("Last-Five: ",lastFive)
+            
+            
+            
